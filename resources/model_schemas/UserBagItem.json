@@ -1,0 +1,69 @@
+[
+    {
+        "name": "id",
+        "dbType": "increments",
+        "htmlType": "",
+        "validations": "",
+        "searchable": false,
+        "fillable": false,
+        "primary": true,
+        "inForm": false,
+        "inIndex": false,
+        "inView": false
+    },
+    {
+        "name": "quantity",
+        "dbType": "integer",
+        "htmlType": "text",
+        "validations": "required",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "user_id",
+        "dbType": "integer:unsigned:default,0:foreign,users,id",
+        "relation": "mt1,Users,user_id,id",
+        "primary": true
+    },
+    {
+        "name": "game_instance_id",
+        "dbType": "integer:unsigned:default,0:foreign,game_instances,id",
+        "relation": "mt1,GameInstance,game_instance_id,id",
+        "primary": true
+    },
+    {
+        "name": "bag_item_type_id",
+        "dbType": "integer:unsigned:default,0:foreign,bag_item_type,id",
+        "relation": "mt1,BagItemType,bag_item_type_id,id",
+        "primary": true
+    },
+
+    {
+        "name": "created_at",
+        "dbType": "timestamp",
+        "htmlType": "",
+        "validations": "",
+        "searchable": false,
+        "fillable": false,
+        "primary": false,
+        "inForm": false,
+        "inIndex": false,
+        "inView": true
+    },
+    {
+        "name": "updated_at",
+        "dbType": "timestamp",
+        "htmlType": "",
+        "validations": "",
+        "searchable": false,
+        "fillable": false,
+        "primary": false,
+        "inForm": false,
+        "inIndex": false,
+        "inView": true
+    }
+]

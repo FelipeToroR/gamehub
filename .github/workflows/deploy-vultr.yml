@@ -1,0 +1,18 @@
+name: CD GameHUB
+
+on: [push]
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Despliegue en servidor
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_TESTING_SERVER_IP }}
+          username: ${{ secrets.DEPLOY_TESTING_SERVER_USERNAME }}
+          key: ${{ secrets.DEPLOY_TESTING_KEY }}
+          port: ${{ secrets.DEPLOY_TESTING_PORT }}
+          script: cd /root/ghtest && git pull git@github.com:fdiazb/gamehub.git

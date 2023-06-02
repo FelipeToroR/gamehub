@@ -1,0 +1,13 @@
+ {
+            "name": "Listen for XDebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9001,
+            "pathMappings": {
+                //"/public": "${workspaceFolder}"
+                "/var/www/html": "${workspaceFolder}"
+            },
+            "ignore": [
+                "**/vendor/**/*.php"
+            ]
+        }

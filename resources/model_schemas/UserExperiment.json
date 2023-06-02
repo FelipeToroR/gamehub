@@ -1,0 +1,52 @@
+[
+    {
+        "name": "user_id",
+        "dbType": "integer:unsigned:default,0:foreign,users,id",
+        "htmlType": "selectTable:users:name,id",
+        "relation": "mt1,Users,user_id,id",
+        "primary": true
+    },
+    {
+        "name": "experiment_id",
+        "dbType": "integer:unsigned:default,0:foreign,experiments,id",
+        "htmlType": "selectTable:experiments:name,id",
+        "relation": "mt1,Experiment,experiment_id,id",
+        "primary": true
+    },
+    {
+        "name": "enabled",
+        "dbType": "integer:unsigned:default,0",
+        "htmlType": "select,Activo:1,Inactivo:0",
+        "validations": "required",
+        "searchable": false,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "created_at",
+        "dbType": "timestamp",
+        "htmlType": null,
+        "validations": null,
+        "searchable": false,
+        "fillable": false,
+        "primary": false,
+        "inForm": false,
+        "inIndex": false,
+        "inView": true
+    },
+    {
+        "name": "updated_at",
+        "dbType": "timestamp",
+        "htmlType": null,
+        "validations": null,
+        "searchable": false,
+        "fillable": false,
+        "primary": false,
+        "inForm": false,
+        "inIndex": false,
+        "inView": true
+    }
+]

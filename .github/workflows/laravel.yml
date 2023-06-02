@@ -1,0 +1,52 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  laravel-tests:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Copiar .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Instalar dependencias
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: Generar key
+      run: php artisan key:generate
+    - name: Permisos para directorios
+      run: chmod -R 777 storage bootstrap/cache
+    - name: Crear base de datos
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: vendor/bin/phpunit
+#    - name: Copia archivos a servidor de producción
+#      uses: appleboy/ssh-action@master
+#      with:
+#        host: ${{ secrets.HOST }}
+#        username: ${{ secrets.USERNAME }}
+#        key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+#        port: ${{ secrets.PORT }}
+#        script: whoami
+#    - name: Docker Deployment
+#      uses: wshihadeh/docker-deployment-action@v1
+#      with:
+#        remote_docker_host: ${{ secrets.USER }}@${{ secrets.HOST }}
+#        ssh_private_key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+#        ssh_public_key: ${{ secrets.DOCKER_SSH_PUBLIC_KEY }}
+#        deployment_mode: docker-compose
+#        copy_stack_file: true
+#        deploy_path: /root/gh
+#        stack_file_name: docker-compose.yml
+#        keep_files: 5
+#        args: up -d

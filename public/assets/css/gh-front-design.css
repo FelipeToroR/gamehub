@@ -1,0 +1,140 @@
+
+/* Footer sticky */
+html, body {
+    height: 100%;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+section.section {
+    flex: 1 0 auto;
+}
+.footer {
+    flex-shrink: 0;
+}
+
+.navbar{
+    background: linear-gradient(150deg, #018ad0 15%, #48d2ee 70%);
+
+    border-bottom: 1px solid #1ba4da;  
+
+}
+
+.section-shaped {
+}
+
+.login-page, .register-page {
+    background: #3c8dbc;
+}
+
+/*
+
+
+
+
+.section-shaped {
+  height: 100vh;
+} */
+
+
+
+/* Fondo animado nubes */
+.bg-cloud{
+    background-image: url('/assets/gamification/bg-clouds.jpg');
+    width: 100%;
+    /*height: 100%;
+    position: absolute;*/
+    background-repeat: repeat;
+    background-position: 0 0;
+    background-size: auto 100%;
+    animation: animDirToLeft 1000s linear infinite;
+}
+
+@keyframes animDirToLeft {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: -10000px 0;
+    }
+  }
+
+
+  /* Animación de moneda voladora */
+  button {
+    margin:10px;
+}
+.coin{
+    position:absolute;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background-color:yellow;
+    border:1px dotted #333;
+    -webkit-animation:1s animateOpacity;
+}
+.cart {
+    float:right;
+    width:50px;
+    height:30px;
+    line-height:30px;
+    background-color:gray;
+    text-align:center;
+}
+@-webkit-keyframes animateOpacity {
+    from {opacity: 0;}
+    5% {opacity: 0.6;}
+    50% {opacity: 1;}
+    95% {opacity: 0.6;}
+    to {opacity: 0;}
+}
+
+/* Card reward */
+
+.card-reward .card-header {
+    padding: 4px 6px;
+}
+
+.card-reward .card-body {
+    padding: 0;
+    margin: 0;
+}
+
+.card-reward .card-footer {
+    padding: 4px 6px;
+    margin: 0;
+}
+
+.card-reward .card-footer p{
+    padding: 0;
+    margin: 0;
+}
+
+.card-reward.active{
+    background-color: greenyellow;
+    border: 2px solid green;
+}
+
+.card-reward.active .card-header, .card-reward.active .card-footer {
+    background-color: green;
+    color: white;
+}
+
+.card-reward.disabled{
+    background-color: white;
+    border: 2px solid gainsboro;
+}
+
+.card-reward.disabled .card-header, .card-reward.disabled .card-footer {
+    background-color: gainsboro;
+    color: black;
+}
+
+.card-reward.disabled .card-body img{
+    filter: grayscale(100%);
+}
+
+.section {
+    padding-top: 5rem !important;
+}

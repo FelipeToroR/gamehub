@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: rotpeod35mg
+      MYSQL_DATABASE: ghdb
+      MYSQL_USER: ghadmin
+      MYSQL_PASSWORD: rotpeod35mg
+    ports:
+      - "3306:3306"
+    volumes:
+      - my-gh-volume:/var/lib/mysql
+  web:
+    build:
+      dockerfile: ./.docker/Dockerfile-php
+      context: .
+    environment:
+      XDEBUG_CONFIG: remote_host=host.docker.internal remote_port=9000 remote_enable=1
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html/
+    extra_hosts:
+      - "gamehub.test:127.0.0.1"
+    ports:
+      - "80:80"
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+
+
+
+volumes:
+  my-gh-volume:

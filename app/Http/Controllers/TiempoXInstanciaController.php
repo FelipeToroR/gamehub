@@ -8,6 +8,7 @@ use App\Models\Experiment;
 use App\Models\GameInstance;
 use App\Models\GameExercise;
 use App\User;
+use ConsoleTVs\Charts\Facades\Charts;
 
 
 
@@ -182,10 +183,53 @@ class TiempoXInstanciaController extends Controller
             ->groupBy('users.id')
             ->get();
 
-    
+        $tiempos = [];
+        $tiempoTotal = 0; 
+        
+        foreach ($users as $user) {
+
+            $tiempoTotalAlumno = DB::table('game_exercises')
+            ->select(DB::raw('SUM(TIMESTAMPDIFF(SECOND, time_start, time_end)) as tiempo_total'))
+            ->where('game_instance_id', $id)
+            ->where('event', 2) // jugando
+            ->where('user_id', $user->user_id)
+            ->value('tiempo_total');
+
+            $user['tiempo_total'] = $tiempoTotalAlumno;
+
+            $tiempoTotal += $tiempoTotalAlumno;
+
+            $tiempos[] = $tiempoTotalAlumno;
+            
+        }    
+       
+        $tiempoPromedioPorUsuario = (count($users) > 0 ) ?  $tiempoTotal / count($users) : 0 ;
+        
+          // Recupera fecha mas lejana y mas próxima de los que hay registro
+          $res = GameExercise::join('game_instances', 'game_exercises.game_instance_id', '=', 'game_instances.id', 'left')
+          ->where('game_instances.experiment_id', '=', $id)
+          ->select(DB::raw('MIN(DISTINCT(DATE(time_start))) as start, MAX(DISTINCT(DATE(time_end))) as end'))
+          ->get();
+
+        $data['start_date'] = \Carbon\Carbon::parse($res[0]->start);
+        $data['end_date'] = \Carbon\Carbon::parse($res[0]->end);
+        
+        $fechas = [];
+        $fechas[] = $res[0]->start ;
+        $fechas[] = $res[0]->end;
+       
+  
 
     // Pasar los datos del juego a la vista
-    return view('tiempo_x_instancias.grafico_instancia', ['users' => $users]);
+    return view('tiempo_x_instancias.grafico_instancia', ['users' => $users])
+
+
+        ->with('tiempos', $tiempos)
+
+        ->with('fechas', $fechas)
+
+        ->with(['Tprom' => $tiempoPromedioPorUsuario]);
+        
 }
 
 

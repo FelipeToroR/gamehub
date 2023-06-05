@@ -9,30 +9,39 @@
 
    
     
-        <div> {{$user->name }} ( {{$user->user_id}} ) ID instancia : {{$user->game_instance_id}} se demoro : {{$user['tiempo_total']}}</div>
+        <div> {{$user->name }} ( {{$user->user_id}} ) ID instancia : {{$user->game_instance_id}} 
+                se demoro : {{$user['tiempo_total']}}
+                Los dias en que jugó : {{$user['lista_fechas']}}
+                Cuanto se demoró cada dia :  
+                
+                @foreach ($user['tiempo_por_dia'] as $t)
+                   
+                  {{$t}}
+                @endforeach
+        </div>
+        
         <div></div>
         
 
     @endforeach
 
-    @foreach ($fechas as $f)
-    <div>{{$f}}</div>
 
-    @endforeach
+<script>
+  var users = <?php echo json_encode($users); ?>;
+  var nombres_usuarios = [];
+  users.forEach(user => {
+    nombres_usuarios.push(user.name);
+  });
 
-
-    <script>
   var tiempos = <?php echo json_encode($tiempos); ?>;
+
+  var promedio = <?php echo json_encode($promedio); ?>;
+  const promedioArray = Array(tiempos.length).fill(promedio);
 </script>
 
-        <div> Tiempo total usado fue : {{$Tprom}} </div>
-        <div></div>
-        
-    
-        <div>
-        <canvas id="myChart"></canvas>
-        </div>
-
+<div class="chart-container" style="width: 80%;">
+  <canvas id="myChart"></canvas> 
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -42,15 +51,23 @@
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: nombres_usuarios,
       datasets: [{
-        label: '# of Votes',
-        //data: [12, 19, 3, 5, 2, 3],
+        label: 'Minutos jugados por usario',
         data: tiempos,
 
-        borderWidth: 1
-      }]
+        backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)', 'rgba(255, 159, 64, 0.5)'],
+        borderWidth: 2
     },
+    {
+      label: 'Promedio',
+      type: 'line',
+      data: promedioArray,
+      borderColor: 'rgba(255, 99, 132, 1)',
+      borderWidth: 2,
+      fill: false
+    }]
+  },
     options: {
       scales: {
         y: {
@@ -63,37 +80,55 @@
 
 
 
-<canvas id="graficoJuegos"></canvas>
+
+<script> 
+  var dias_x_tiempo = <?php echo json_encode($dias_jugados); ?>;
+
+  const todas_las_fechas = <?php echo json_encode($fechasCompletas); ?>;
+
+  const tiempoJugado = new Array(todas_las_fechas.length).fill(0);
+
+  for (var i = 0; i < todas_las_fechas.length; i++) {
+
+    var fecha = todas_las_fechas[i];
+
+  if (dias_x_tiempo[fecha] !== undefined) {
+    tiempoJugado[i] = dias_x_tiempo[fecha];
+  }
+
+}
+
+</script>
+
+<div><canvas id="graficoJuegos"></canvas></div>
+
 <div>
- <input onchange="filtrarDatos()" type="date" id="stardate" value="2021-08-25">
- <input onchange="filtrarDatos()" type="date" id="enddate" value="2021-08-31">
+ <input onchange="filtrarDatos()" type="date" id="stardate" value="{{ $fecha_mas_lejana }}">
+ <input onchange="filtrarDatos()" type="date" id="enddate" value="{{ $fecha_mas_reciente }}">
 
 </div>
 
 <script>
-  var fechas = <?php echo json_encode($fechas); ?>;
+  
 </script>
 
 <script>
-  //var fechas = {!! json_encode($fechas) !!};
 
-  //const ctz = document.getElementById('graficoJuegos');
   var ctz = document.getElementById('graficoJuegos').getContext('2d');
   
-  const dates = ['2021-08-25','2021-08-26','2021-08-27','2021-08-28','2021-08-29', '2021-08-30', '2021-08-31'];
-  const dataPoints = [1, 2 , 3 , 4 , 5 , 6,  7 ];
   // Configuración inicial del gráfico
   var config = {
     type: 'bar',
     data: {
-      //labels: fechas,
-      labels: dates,
+      labels: todas_las_fechas,
 
       datasets: [{
         label: 'Juegos por día',
         // Los datos se actualizarán con el filtro seleccionado
-        data: dataPoints,
-        borderWidth: 1
+        data: tiempoJugado,
+        
+        
+        borderWidth: 2
       }]
     },
     options: {
@@ -111,18 +146,12 @@
   // Función para filtrar los datos según el rango seleccionado
   function filtrarDatos(rango) {
 
-    const dates2 = [...dates]; // se duplica el original
-    //console.log(dates2);
-
-    
-    const fechaInicio =  document.getElementById('stardate');
-    const fechaFin = document.getElementById('enddate');
+    const dates2 = [...todas_las_fechas]; // se duplica el original
 
     //obtener la posicion en el array 
-    const indexStartDate = dates2.indexOf(fechaInicio.value);
-    const indexEndDate = dates2.indexOf(fechaFin.value);
+    const indexStartDate = dates2.indexOf(document.getElementById('stardate').value);
+    const indexEndDate = dates2.indexOf(document.getElementById('enddate').value);
 
-    console.log(indexEndDate);
 
     // Filtrar los datos según el rango seleccionado
     const fechasFiltradas = dates2.slice(indexStartDate, indexEndDate + 1);
@@ -132,7 +161,7 @@
 
 
     // Actualizar dataPoints
-    const dataPoints2 = [...dataPoints]; // solo arreglos simples, no nested
+    const dataPoints2 = [...tiempoJugado]; // solo arreglos simples, no nested
     const dataPointsFiltrados = dataPoints2.slice(indexStartDate, indexEndDate + 1); 
 
     grafico.config.data.datasets[0].data = dataPointsFiltrados;

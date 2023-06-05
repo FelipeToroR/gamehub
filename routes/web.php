@@ -209,7 +209,8 @@ Route::post('/tiempo_x_instancias/listar_instancias', 'TiempoXInstanciaControlle
 
 Route::get('/tiempo_x_instancias/grafico_instancia/{id}', 'TiempoXInstanciaController@showgraphic')->name('tiempo_x_instancias.grafico_instancia')->middleware('verified');
 
-//Route::post('/tiempo_x_instancias/listar_instancias', 'TiempoXInstanciaController@listarInstanciasAsociadas')->name('tiempo_x_instancias.listarInstanciasAsociadas');
+Route::get('/tiempo_x_instancias/comparar_instancias/{id}', 'TiempoXInstanciaController@compararInstancias')->name('tiempo_x_instancias.comparar_instancias')->middleware('verified');
+
 
 
 

@@ -9,6 +9,7 @@ use App\Models\GameInstance;
 use App\Models\GameExercise;
 use App\User;
 use ConsoleTVs\Charts\Facades\Charts;
+use Carbon\Carbon;
 
 
 
@@ -183,6 +184,7 @@ class TiempoXInstanciaController extends Controller
             ->groupBy('users.id')
             ->get();
 
+        $dias_jugados = [];
         $tiempos = [];
         $tiempoTotal = 0; 
         
@@ -195,42 +197,108 @@ class TiempoXInstanciaController extends Controller
             ->where('user_id', $user->user_id)
             ->value('tiempo_total');
 
-            $user['tiempo_total'] = $tiempoTotalAlumno;
+            $user['tiempo_total'] = $tiempoTotalAlumno/60;
 
-            $tiempoTotal += $tiempoTotalAlumno;
+            $tiempoTotal += $tiempoTotalAlumno/60;
 
-            $tiempos[] = $tiempoTotalAlumno;
+            $tiempos[] = $tiempoTotalAlumno/60;
+
+            // Dias en que ha jugado el alumno
+            $fechasUnicas = GameExercise::distinct()
+            ->select(DB::raw('DATE(time_start) as fecha'))
+            ->where('user_id', $user->user_id)
+            ->where('game_instance_id', $id)
+            ->where('event', 2) // jugando
+            ->pluck('fecha');
+
+
+            $user['lista_fechas'] = $fechasUnicas;
+            $lista_tiempo = [];
+
+            if (count($fechasUnicas) > 0) {
+
+                foreach ($fechasUnicas as $fecha) 
+                { 
+                    
+                    // La clave NO existe, agrego la fecha
+                    if (!array_key_exists($fecha, $dias_jugados))  
+                    {   $dias_jugados[$fecha] = 0; }
+
+                $tiempoTotalAlumno_por_dia = DB::table('game_exercises')
+                    ->select(DB::raw('SUM(TIMESTAMPDIFF(SECOND, time_start, time_end)) as tiempo_total'))
+                    ->where('game_instance_id', $id)
+                    ->where('event', 2) // jugando
+                    ->where('user_id', $user->user_id)
+                    ->whereRaw("DATE(time_start) = ?", [$fecha])
+                    ->value('tiempo_total');
+
+                  
+                    $dias_jugados[$fecha] += $tiempoTotalAlumno_por_dia;
+
+                $lista_tiempo[] = $tiempoTotalAlumno_por_dia;
+                }   
+
+            } else{
+                $tiempoTotalAlumno_por_dia = 0;
+            }
+
+            $user['tiempo_por_dia'] = $lista_tiempo;
             
-        }    
+            
+        }  
+
+        $fecha_mas_lejana  = Carbon::today()->format('Y-m-d');
+        $fecha_mas_reciente = Carbon::today()->format('Y-m-d');
+
+        
+        if (count($dias_jugados) > 0) {  
+
+        ksort($dias_jugados); // Se ordenan el arreglo por fechas (mas lejana hasta mas reciente)
+
+        $fecha_mas_lejana =   array_key_first($dias_jugados);
+        $fecha_mas_reciente = array_key_last($dias_jugados);
+
+        $timestampInicio = strtotime($fecha_mas_lejana);
+        $timestampFin = strtotime($fecha_mas_reciente);
+
+        // Generar las fechas intermedias
+        $fechasIntermedias = [];
+        for ($i = $timestampInicio + 86400; $i < $timestampFin; $i += 86400) {
+            $fechaIntermedia = date('Y-m-d', $i);
+            $fechasIntermedias[] = $fechaIntermedia;
+        }
+
+        // Combinar todas las fechas en un solo arreglo
+        $fechasCompletas = array_merge([$fecha_mas_lejana], $fechasIntermedias, [$fecha_mas_reciente]);
        
+        }
+
+
         $tiempoPromedioPorUsuario = (count($users) > 0 ) ?  $tiempoTotal / count($users) : 0 ;
         
-          // Recupera fecha mas lejana y mas próxima de los que hay registro
-          $res = GameExercise::join('game_instances', 'game_exercises.game_instance_id', '=', 'game_instances.id', 'left')
-          ->where('game_instances.experiment_id', '=', $id)
-          ->select(DB::raw('MIN(DISTINCT(DATE(time_start))) as start, MAX(DISTINCT(DATE(time_end))) as end'))
-          ->get();
-
-        $data['start_date'] = \Carbon\Carbon::parse($res[0]->start);
-        $data['end_date'] = \Carbon\Carbon::parse($res[0]->end);
-        
-        $fechas = [];
-        $fechas[] = $res[0]->start ;
-        $fechas[] = $res[0]->end;
-       
-  
 
     // Pasar los datos del juego a la vista
     return view('tiempo_x_instancias.grafico_instancia', ['users' => $users])
 
-
         ->with('tiempos', $tiempos)
 
-        ->with('fechas', $fechas)
+        ->with( compact('dias_jugados'))
 
-        ->with(['Tprom' => $tiempoPromedioPorUsuario]);
+        ->with( compact('fecha_mas_lejana', 'fecha_mas_reciente'))
+
+        ->with( compact('fechasCompletas'))
+
+        ->with(['promedio' => $tiempoPromedioPorUsuario]);
         
 }
+
+
+public function compararInstancias($id){
+    return view('tiempo_x_instancias.comparar_instancias');
+
+}
+
+
 
 
 

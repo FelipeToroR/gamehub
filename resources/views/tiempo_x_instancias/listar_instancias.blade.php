@@ -32,16 +32,13 @@
         
 
     @endforeach
-<!--
-    @foreach ($users as $user)
-    
-        <div> {{$user->name }} con ID instancia : {{$user->game_instance_id}}</div>
-        <div></div>
-        
 
-    @endforeach
-
-    -->
+    <div class="d-flex justify-content-center mt-4">
+      <button class="btn btn-primary btn-lg" style="width: 50%;">
+        <a href="{{ route('tiempo_x_instancias.comparar_instancias', ['id' => $id]) }}" class="btn btn-primary">Comparar instancias</a>
+        <i class="fa-sharp fa-regular fa-scale-unbalanced-flip"></i>
+      </button>
+    </div>
 
 
 @endsection

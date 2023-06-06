@@ -9,7 +9,8 @@
 
    
     
-        <div> {{$user->name }} ( {{$user->user_id}} ) ID instancia : {{$user->game_instance_id}} 
+        <div> {{$user->name }} ( {{$user->user_id}} ) 
+                ID instancia : {{$user->game_instance_id}} 
                 se demoro : {{$user['tiempo_total']}}
                 Los dias en que jugó : {{$user['lista_fechas']}}
                 Cuanto se demoró cada dia :  

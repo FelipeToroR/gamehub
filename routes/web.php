@@ -211,7 +211,7 @@ Route::get('/tiempo_x_instancias/grafico_instancia/{id}', 'TiempoXInstanciaContr
 
 Route::get('/tiempo_x_instancias/comparar_instancias/{id}', 'TiempoXInstanciaController@compararInstancias')->name('tiempo_x_instancias.comparar_instancias')->middleware('verified');
 
-
+Route::get('/rendimiento_grupos', 'RendimientoGrupoController@index')->name('rendimiento_grupos.index')->middleware('verified');
 
 
 

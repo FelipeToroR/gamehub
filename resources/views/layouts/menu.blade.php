@@ -48,5 +48,9 @@
     <a href="{{ route('tiempo_x_instancias.index') }}"><i class="fa fa-calendar"></i><span>Tiempo por Instancia</span></a>
 </li>
 
+<li class="{{ Request::is('rendimiento_grupos*') ? 'active' : '' }}">
+    <a href="{{ route('rendimiento_grupos.index') }}"><i class="fa fa-line-chart" aria-hidden="true"></i><span>Rendimiento por Grupos</span></a>
+</li>
+
 
 

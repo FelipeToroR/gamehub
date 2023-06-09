@@ -1,78 +1,79 @@
-<canvas id="bar-chart"></canvas>
-
 <!-- Incluye la biblioteca de Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<canvas id="bar-chart"></canvas>
+
 <script>
-        // Obtener los datos pasados desde el controlador
-        var groupsData = {!! json_encode($groupsData) !!};
 
-        // Crear un array para almacenar las etiquetas de las barras
-        var labels = [];
+    // Obtener los datos pasados desde el controlador
+    var groupsData = {!! json_encode($groupsData) !!};
+   
 
-        // Crear un array para almacenar los datos de cada columna
-        var datasets = [];
+    var ctx = document.getElementById("bar-chart").getContext("2d");
 
-        // Recorrer los datos de los grupos
-        groupsData.forEach(function(group) {
-            // Agregar la etiqueta del grupo al array de etiquetas
-            labels.push(group.groupName);
+    // Crear arrays para almacenar los nombres de los grupos y los datasets
+    var groupNames = [];
 
-            // Recorrer los datos de cada columna del grupo
-            group.data.forEach(function(column, index) {
-                // Verificar si ya existe un dataset para la columna actual
-                var dataset = datasets.find(function(ds) {
-                    return ds.label === column.label;
-                });
+    //Arreglos para almacenar los ejercicios de cada instancia
+    var buenosData = [], malosData = [], omitidosData = [];
 
-                // Si no existe, crear un nuevo dataset para la columna actual
-                if (!dataset) {
-                    dataset = {
-                        label: column.label,
-                        data: [],
-                        backgroundColor: getRandomColor() // Función para obtener un color aleatorio
-                    };
+    
+    // Recorrer los datos de los grupos
+ groupsData.forEach(function(groupData) {
+    // Agregar el nombre del grupo al array de nombres de grupos
+    groupNames.push(groupData.groupName);
 
-                    // Agregar el dataset al array de datasets
-                    datasets.push(dataset);
-                }
+    // Obtener los datos de ejercicios buenos, malos y omitidos del grupo actual
+    var ejerciciosBuenos = groupData.data.CantEjerBuenos || [];
+    var ejerciciosMalos = groupData.data.CantEjerMalos || [];
+    var ejerciciosOmitidos = groupData.data.CantEjerOmitidos || [];
 
-                // Agregar el valor de la columna al dataset correspondiente
-                dataset.data.push(column.value);
-            });
-        });
+     // Sumar los puntajes de ejercicios buenos, malos y omitidos
+    var sumBuenos = ejerciciosBuenos.reduce((a, b) => a + b, 0) ;
+    var sumMalos = ejerciciosMalos.reduce((a, b) => a + b, 0);
+    var sumOmitidos = ejerciciosOmitidos.reduce((a, b) => a + b, 0);
 
-        // Crear el gráfico de barras agrupado con columnas contiguas
-        var ctx = document.getElementById('bar-chart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                indexAxis: 'y', // Mostrar las columnas de forma vertical
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true
-                    }
-                }
-            }
-        });
+    // Agregar los datos al dataset del grupo actual
+    buenosData.push(sumBuenos );
+    malosData.push(sumMalos);
+    omitidosData.push(sumOmitidos);
+});
 
-        // Función para generar un color aleatorio en formato hexadecimal
-        function getRandomColor() {
-            var letters = '0123456789ABCDEF';
-            var color = '#';
-            for (var i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
+
+var data = {
+    labels: groupNames,
+    datasets: [
+
+        {
+            label: "Buenas",
+            backgroundColor: "green",
+            data: buenosData
+        },
+        {
+            label: "Malas",
+            backgroundColor: "red",
+            data: malosData
+        },
+        {
+            label: "Omitidas",
+            backgroundColor: "blue",
+            data: omitidosData
         }
-    </script>
+    ]
+}
 
+// Crear la instancia del gráfico de barras
+var myBarChart = new Chart(ctx, {
+    type: "bar",
+    data: data,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+</script>
 

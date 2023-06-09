@@ -66,28 +66,32 @@ class RendimientoGrupoController extends Controller
 
         }
 
-        var_dump($Grupos);
-        exit();
+      
         //++++++++++++ Prepara datos para el grafico +++++++++++
 
-        $groupNames = ['Numeribirds', 'AquaMath'];
+        $groupNames = array_keys($Grupos);
 
         // Obtener los datos para cada grupo
         $groupsData = [];
         foreach ($groupNames as $groupName) {
             $groupData = [
                 'groupName' => $groupName,
-                'data' => [1,2,3,4 ]// Obtener los datos para el grupo actual
+                'data' => [
+                    'CantEjerBuenos'    => $Grupos[$groupName]['CantEjerBuenos'] ,
+                    'CantEjerMalos'    => $Grupos[$groupName]['CantEjerMalos'] ,
+                    'CantEjerOmitidos' => $Grupos[$groupName]['CantEjerOmitidos']
+                ]
+                
             ];
             $groupsData[] = $groupData;
         }
 
-     
+      
         // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         return view('rendimiento_grupos.index')
-        ->with(compact('groupsData'))
+        ->with('groupsData' , $groupsData)
         ->with('sheets', $sheets);
         
     }

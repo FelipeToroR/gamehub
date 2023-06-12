@@ -52,5 +52,9 @@
     <a href="{{ route('rendimiento_grupos.index') }}"><i class="fa fa-line-chart" aria-hidden="true"></i><span>Rendimiento por Grupos</span></a>
 </li>
 
+<li class="{{ Request::is('respuestas*') ? 'active' : '' }}">
+    <a href="{{ route('respuestas.index') }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Encuestas</span></a>
+</li>
+
 
 

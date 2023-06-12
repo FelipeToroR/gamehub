@@ -17,20 +17,32 @@ use Illuminate\Http\Request;
 
 class RendimientoGrupoController extends Controller
 {
+    private $experimentos;
+
+    public function __construct()
+    {
+        $this->experimentos = Experiment::all();
+    }
+    
     public function index()
     {
-        //$experiment = Experiment::find($experiment_id);
-        $experiment = Experiment::find(3);
 
-        $sheets = [];
+        return view('rendimiento_grupos.index', $this->getExperimentosTodos());
+        
+    }
 
-        $obj = new ConsolidatedPerUserSheet($experiment);
+    public function mostrarGraficosRendimiento(Request $request)
+    {
+        $experimento_id = intval($request->input('exp'));
+        
+        $experiment = Experiment::find($experimento_id);
 
-        $aux = $obj->query();
 
-        $UNO = $aux->get();
+        $objConsolidated = new ConsolidatedPerUserSheet($experiment);
+        $datosCons = $objConsolidated->query()->get();
 
-        $tipos_instancias = $UNO->pluck('tipo')->unique()->toArray();
+        $tipos_instancias = [];
+        $tipos_instancias = $datosCons->pluck('tipo')->unique()->toArray();
 
       
         $Grupos = [];
@@ -38,36 +50,17 @@ class RendimientoGrupoController extends Controller
             $Grupos[$tipo] = [];
         }
 
-        foreach ($UNO as $item) {
+        foreach ($datosCons as $item) {
 
-           
-
-            //$usuarioId = $item->usuario_id;
-            $nombre = $item->nombre;
-            //$tipo = $item->tipo;
-            //$gender = $item->gender;
-            $porcBuenos = $item->qdistinctexer;
-            $ejerBuenos = $item->cant_ejercicios_buenos;
-            $ejerMalos = $item->cant_ejercicios_malos;
-            $ejerOmitidos = $item->cant_ejercicios_omitidos;
-
-        
-            echo "Nombre: " . $nombre . "<br>";
-
-            echo "Ejercicios distintos: " . $porcBuenos . "<br>";
-            echo "Ejercicios buenos: " . $ejerBuenos . "<br>";
-
-
-            $Grupos[$item->tipo]['CantEjerBuenos']  []   = $ejerBuenos ;
-            $Grupos[$item->tipo]['CantEjerMalos']   []   = $ejerMalos ;
-            $Grupos[$item->tipo]['CantEjerOmitidos'][]   = $ejerOmitidos ;
-
-
+            $Grupos[$item->tipo]['CantEjerBuenos']  []  = $item->cant_ejercicios_buenos;
+            $Grupos[$item->tipo]['CantEjerMalos']   []  = $item->cant_ejercicios_malos;
+            $Grupos[$item->tipo]['CantEjerOmitidos'][]  = $item->cant_ejercicios_omitidos;
 
         }
 
       
-        //++++++++++++ Prepara datos para el grafico +++++++++++
+        //++++++++++++ Prepara datos para el grafico (agrupado vertical) +++++++++++
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         $groupNames = array_keys($Grupos);
 
@@ -77,8 +70,8 @@ class RendimientoGrupoController extends Controller
             $groupData = [
                 'groupName' => $groupName,
                 'data' => [
-                    'CantEjerBuenos'    => $Grupos[$groupName]['CantEjerBuenos'] ,
-                    'CantEjerMalos'    => $Grupos[$groupName]['CantEjerMalos'] ,
+                    'CantEjerBuenos'   => $Grupos[$groupName]['CantEjerBuenos'] ,
+                    'CantEjerMalos'    => $Grupos[$groupName]['CantEjerMalos']  ,
                     'CantEjerOmitidos' => $Grupos[$groupName]['CantEjerOmitidos']
                 ]
                 
@@ -87,13 +80,85 @@ class RendimientoGrupoController extends Controller
         }
 
       
-        // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        return view('rendimiento_grupos.index')
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // + Prepara datos para el grafico porcentaje buenas (lineas) +
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        $objEvolution = new EvolutionPerExerciseSheet($experiment);
+        $datosEvo = $objEvolution->query()->get();
+        $instanciasEvo = $datosEvo->pluck('tipo')->unique()->toArray();
+
+        $total_ejercicios = $datosEvo->pluck('ejercicio')->unique()->flip()->toArray();
+        $buenas_por_ejercicio = $datosEvo->pluck('ejercicio')->unique()->flip()->toArray();
+
+        $users = $datosEvo->pluck('nombre')->unique()->flip()->toArray();
+       
+        $UsuariosPorGrupo = $datosEvo->groupBy('tipo')->map(function ($grupo) {
+            return $grupo->pluck('nombre')->unique()->flip()->toArray();
+        })->toArray();
+        
+    
+        foreach ($UsuariosPorGrupo as $instancia => $usuarios) {
+            
+            foreach ($usuarios as $NombreUsuario => $valor) {
+        
+                $UsuariosPorGrupo[$instancia][$NombreUsuario] = [];
+                $UsuariosPorGrupo[$instancia][$NombreUsuario]['Buenas']   = 0;
+                $UsuariosPorGrupo[$instancia][$NombreUsuario]['Malas']    = 0;
+                $UsuariosPorGrupo[$instancia][$NombreUsuario]['Omitidas'] = 0;
+            }
+
+        }
+
+
+       /* $Total  = [];
+        $Buenas = [];
+        foreach ($instanciasEvo as $instancia) {
+            $Total[$instancia]  = [];
+            $Buenas[$instancia] = [];
+        
+            foreach ($total_ejercicios as $key => $valor) {
+                $total_ejercicios[$key] = 0;
+                $buenas_por_ejercicio[$key] = 0;
+            }
+        
+            $Total[$instancia] = $total_ejercicios;
+            $Buenas[$instancia] = $buenas_por_ejercicio;
+        
+            // ...
+        }
+      */
+
+        foreach ($datosEvo as $item) {
+
+            $frecuencia = explode('|', $item->secuencia);
+            $frecuencia_count = count($frecuencia);
+
+            foreach ($frecuencia as $f) {
+                if ($f == 'B')
+                    $UsuariosPorGrupo[$item->tipo][$item->nombre]['Buenas']   +=  1;
+                else if ($f == 'M') 
+                    $UsuariosPorGrupo[$item->tipo][$item->nombre]['Malas']   +=  1;
+                else 
+                    $UsuariosPorGrupo[$item->tipo][$item->nombre]['Omitidas']   +=  1;
+            }
+        }
+
+        return view('rendimiento_grupos.graficos_rendimiento')
         ->with('groupsData' , $groupsData)
-        ->with('sheets', $sheets);
+        ->with('UsuariosPorGrupo', $UsuariosPorGrupo)
+        ->with($this->getExperimentosTodos())
+        ->with( ['id' => $experimento_id])
+        ->with('experiment' , $experiment);
         
     }
 
+    private function getExperimentosTodos()
+    {
+        return [
+            'experimentos' => $this->experimentos,
+            
+        ];
+    }
 }

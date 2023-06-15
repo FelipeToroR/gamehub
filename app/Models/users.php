@@ -98,4 +98,9 @@ class users extends Model
     {
         return $this->belongsToMany(\App\Models\Experiment::class, 'user_experiments');
     }
+
+    public function userProfile()
+{
+    return $this->hasOne(UserProfile::class, 'user_id');
+}
 }

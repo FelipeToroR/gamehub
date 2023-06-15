@@ -72,4 +72,9 @@ class User extends Authenticatable // implements MustVerifyEmail
         return $this->belongsToMany(\App\Models\Experiment::class, 'user_experiments');
     }
 
+    public function userProfile()
+    {
+        return $this->hasOne(\App\Models\UserProfile::class, 'user_id');
+    }
+
 }

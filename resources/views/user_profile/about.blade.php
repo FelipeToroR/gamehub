@@ -1,7 +1,34 @@
 @extends('user_profile.user_profile')
 
 @section('specific_content')
+<!-- enlaces y scripts para SweetAlert -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
 
+<script>
+    window.onload = function() {
+        var targetElement = document.getElementById('scroll-target');
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+</script>
+
+@if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                timer: 1000, // 1 segundo
+                showConfirmButton: false
+            });
+        });
+    </script>
+@endif
+
+<div id="scroll-target"></div>
 <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-md-8">
@@ -43,7 +70,7 @@
                 <label for="description" class="col-md-4 col-form-label text-md-right">{{ __('Descripción') }}</label>
 
                 <div class="col-md-6">
-                  <textarea id="description" class="form-control @error('description') is-invalid @enderror" name="description" required>{{ old('description', $user->description) }}</textarea>
+                  <textarea id="description" class="form-control @error('description') is-invalid @enderror" name="description" required>{{ $userProfile->description ?? ''}}</textarea>
 
                   @error('description')
                     <span class="invalid-feedback" role="alert">
@@ -57,7 +84,7 @@
                 <label for="birthdate" class="col-md-4 col-form-label text-md-right">{{ __('Fecha de nacimiento') }}</label>
 
                 <div class="col-md-6">
-                  <input id="birthdate" type="date" class="form-control @error('birthdate') is-invalid @enderror" name="birthdate" value="{{ old('birthdate', $user->birthdate) }}" required>
+                  <input id="birthdate" type="date" class="form-control @error('birthdate') is-invalid @enderror" name="birthdate" value="{{ old('birthdate', $userProfile->birthdate ?? '') }}" required>
 
                   @error('birthdate')
                     <span class="invalid-feedback" role="alert">
@@ -71,7 +98,7 @@
                 <label for="region" class="col-md-4 col-form-label text-md-right">{{ __('Region') }}</label>
 
                 <div class="col-md-6">
-                  <input id="region" type="text" class="form-control @error('region') is-invalid @enderror" name="region" value="{{ old('region', $user->profile->region ?? '') }}" autocomplete="region">
+                  <input id="region" type="text" class="form-control @error('region') is-invalid @enderror" name="region" value="{{ old('region', $userProfile->region ?? '') }}" autocomplete="region">
 
                   @error('region')
                     <span class="invalid-feedback" role="alert">

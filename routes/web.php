@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\UserProfileController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -196,8 +196,8 @@ Route::get('/user_profile/timeline', 'UserProfileController@timeline')->name('us
 Route::get('/user_profile/medallas', 'UserProfileController@medallas')->name('user_profile.medallas')->middleware('verified');
 
 
-
-Route::put('/user_profile/update', 'UserProfileController@update')->name('user_profile.update');
+// Ruta para actualizar el perfil
+Route::put('/user_profile', 'UserProfileController@update')->name('user_profile.update');
 
 
 /** Mostrar grafico del tiempo usado por en cada instancia */
@@ -216,4 +216,7 @@ Route::get('/rendimiento_grupos', 'RendimientoGrupoController@index')->name('ren
 Route::post('/rendimiento_grupos/graficos_rendimiento', 'RendimientoGrupoController@mostrarGraficosRendimiento')->name('rendimiento_grupos.graficos_rendimiento')->middleware('verified');
 
 Route::get('/respuestas', 'RespuestaController@index')->name('respuestas.index')->middleware('verified');
+
+Route::post('/respuestas/listar_encuestas', 'RespuestaController@listarEncuestas')->name('respuestas.listar_encuestas')->middleware('verified');
+
 

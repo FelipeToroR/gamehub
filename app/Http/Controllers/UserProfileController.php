@@ -10,8 +10,9 @@ use Illuminate\Http\Request;
 use App\Models\Experiment;
 use App\Models\GameExercise;
 use App\Models\UserExperiment;
+use App\Models\UserProfile;
 
-
+//use App\Models\User;
 use App\User;
 
 class UserProfileController extends Controller
@@ -28,7 +29,7 @@ class UserProfileController extends Controller
         $userProfile = $user->userProfile;
 
 
-        return view('user_profile.about', compact('user', 'userProfile'));
+        return view('user_profile.about',compact('user', 'userProfile'));
     }
 
     public function timeline()
@@ -66,9 +67,23 @@ class UserProfileController extends Controller
         $user->email = $request->input('email');
         $user->save();
 
-       
+         // Crear el perfil de usuario si no existe
+         if (!$userProfile) {
+            $userProfile = new UserProfile();
+            $userProfile->user_id = $user->id;
+        }
 
-        return redirect()->back()->with('success', 'Profile updated successfully');
+        // Actualizar los campos en el modelo UserProfile
+        if ($userProfile) {
+            $userProfile->description = $request->input('description');
+            $userProfile->birthdate = $request->input('birthdate');
+            $userProfile->region = $request->input('region');
+            
+            $userProfile->save();
+        }
+    
+        return redirect()->back()->with('success', 'Perfil actualizado correctamente#scroll-target');
+
     }
 }
 

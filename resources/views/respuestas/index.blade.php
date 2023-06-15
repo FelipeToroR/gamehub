@@ -17,7 +17,7 @@
         <div class="box box-primary">
             <div class="box-body">
 
-           <form method="POST" id="GraficosInstancias">
+           <form action="{{ route('respuestas.listar_encuestas') }}" method="POST" id="GraficosInstancias">
             @csrf
 
             <!-- select box de todos los experimentos -->
@@ -39,8 +39,8 @@
                 
             </div>
             <div class="text-center">
-          
-            
+
+            @yield('encuestas')
         
             </div>
         </div>

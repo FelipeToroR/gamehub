@@ -83,7 +83,9 @@
   .profile-menu {
     position: absolute;
     bottom: 0;
-    padding-left: 200px;
+    text-align: center;
+    display: flex; 
+    justify-content: center;
     background: #151728;
     width: 100%;
     display: flex;
@@ -103,6 +105,7 @@
   }
   
   .profile-avatar {
+    position: relative; 
     position: absolute;
     align-items: center;
     display: flex;
@@ -511,7 +514,7 @@
     }
   
     .profile-menu-link {
-      padding: 16px;
+      padding: 20px;
       font-size: 15px;
     }
   }

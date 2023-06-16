@@ -14,12 +14,12 @@
 <div>{{$c}}</div>  
 @endforeach
 
-</div>
+<!--</div>
 
 @foreach ($tiempo_total_cada_instancia as $nombre => $tt)
 
 <div>nombre : {{$nombre}} Tiempo : {{$tt}}</div>  
-@endforeach
+@endforeach -->
 
 <h3>Comparación de minutos jugados</h3>
 

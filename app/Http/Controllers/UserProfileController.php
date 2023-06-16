@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 
-
 use App\Models\Experiment;
 use App\Models\GameExercise;
 use App\Models\UserExperiment;
 use App\Models\UserProfile;
 
-//use App\Models\User;
+use App\Models\UserGameBadge;
+use App\Exports\Sheets\EvolutionPerExerciseSheet;
+
 use App\User;
 
 class UserProfileController extends Controller
@@ -69,8 +70,57 @@ class UserProfileController extends Controller
 
     public function medallas()
     {
+        //Busca todas las medallas asociadas al usuario.
+        $userBadges = UserGameBadge::with('gameBadge')->where('user_id', $this->user->id)->get();
+
+        //Busca todos los experimentos asociados a ese usuario para calcular su desempeño
+        $experiments =  $this->user->experiments;
+
+        $usuario_experiencia[$this->user->name] = 0;
+
+        foreach($experiments as $experiment){
+
+            $objEvolution = new EvolutionPerExerciseSheet($experiment);
+            $datosEvo = $objEvolution->query()
+                        ->where('users.id', $this->user->id)
+                        ->get();
+            
+           foreach ($datosEvo as $item) {
+
+                $frecuencia = explode('|', $item->secuencia);
+                $frecuencia_count = count($frecuencia);
+    
+                foreach ($frecuencia as $f) {
+                    if ($f == 'B'){ // La experiencia se obtiene de sus respuestas Buenas todos lo que ha participado el usario
+                    $usuario_experiencia[$this->user->name] += 10;
+                    }
+                }
+            }
+       
+        }
+
         
+        $currentPoints = $usuario_experiencia[$this->user->name];
+        
+        // Calcula el nivel actual y los puntos necesarios para el próximo nivel
+        $level = floor($currentPoints / 100) + 1;
+        $nextLevelPoints = $level * 100;
+        //$progress = ($currentPoints / $nextLevelPoints) * 100;
+
+        // Calcula el progreso en relación a los puntos del nivel actual y el siguiente nivel
+        $progress = ($currentPoints - (($level - 1) * 100)) / ($nextLevelPoints - (($level - 1) * 100)) * 100;
+
+        // Redondea el progreso a dos decimales
+        $progress = round($progress, 2);
+
+    
         return view('user_profile.medallas')
+        ->with(['userBadges' => $userBadges])
+        ->with('MiExperiencia' , $usuario_experiencia)
+        ->with('currentPoints', $currentPoints)
+        ->with('level', $level)
+        ->with('nextLevelPoints', $nextLevelPoints)
+        ->with('progress', $progress)
         ->with('user', $this->user);
     }
 

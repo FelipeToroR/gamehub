@@ -5,10 +5,8 @@
     <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.js"></script>
     <!--------------------- Se incluye la libreria de gráficos  -------------->
 
-    @foreach ($users as $user)
+   <!-- @foreach ($users as $user)
 
-   
-    
         <div> {{$user->name }} ( {{$user->user_id}} ) 
                 ID instancia : {{$user->game_instance_id}} 
                 se demoro : {{$user['tiempo_total']}}
@@ -22,9 +20,8 @@
         </div>
         
         <div></div>
-        
-
-    @endforeach
+  
+    @endforeach-->
 
 
 <script>

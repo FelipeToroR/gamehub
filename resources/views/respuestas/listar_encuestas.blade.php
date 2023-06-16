@@ -10,10 +10,6 @@
         });
     </script>
 
-    
-    <p>ID: {{ $id }}</p>
-
-
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <canvas id="radarChart"></canvas>

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Listeners\LoginSuccess;
+use App\Listeners\GanarMedallaLogin;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
@@ -21,7 +22,9 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         Login::class => [
+           // GanarMedallaLogin::class,
             LoginSuccess::class
+            
          ]
     ];
 

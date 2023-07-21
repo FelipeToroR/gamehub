@@ -27,6 +27,10 @@ Route::get('/home', 'HomeController@index')->name('home')->middleware('verified'
 /** Juegos */
 Route::resource('games', 'GameController')->middleware('verified');
 Route::resource('games.badges', 'GameBadgeController')->middleware('verified');
+
+Route::get('games/{game_id}/badges','GameBadgeController@index')->name('game_badges.index')->middleware('verified');;
+Route::get('games/{game_id}/badges/create', 'GameBadgeController@create')->name('game_badges.create')->middleware('verified');;
+
 Route::get('badges/{badge}/image', 'GameBadgeController@badge_image')->middleware('verified');
 Route::resource('games.parameters', 'GameParameterController')->middleware('verified');
 

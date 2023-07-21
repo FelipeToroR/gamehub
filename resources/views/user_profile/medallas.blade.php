@@ -17,6 +17,7 @@
 				
 				<div class="row">
 				@foreach ($userBadges as $badge)
+				  @if ( $badge->deleted_at == NULL  && isset( $badge->gameBadge->id ) )
 					<div class="col-md-4 mb-4">
 						<div class="card" style="background-color: white;">
 							<div class="card-body">
@@ -26,6 +27,7 @@
 							</div>
 						</div>
 					</div>
+				  @endif
 				@endforeach
 				</div>
 			</div>

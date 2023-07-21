@@ -19,11 +19,11 @@
 <!-- Game Id Field -->
 <div class="form-group col-sm-6">
     {!! Form::label('game_id', 'Game Id:') !!}
-    {!! Form::select('game_id', $gameItems, null, ['class' => 'form-control']) !!}
+    {!! Form::select('game_id', $gameItems, $game_id, ['class' => 'form-control', 'disabled']) !!}
 </div>
 
 <!-- Submit Field -->
 <div class="form-group col-sm-12">
     {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-    <a href="{{ route('gameBadges.index') }}" class="btn btn-default">Cancel</a>
+    <a href="{{ route('game_badges.index', ['game_id' => $game_id]) }}" class="btn btn-default">Cancel</a>
 </div>

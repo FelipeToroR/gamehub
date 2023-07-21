@@ -88,6 +88,7 @@ class RespuestaController extends Controller
                    
 
                     foreach($respuestas as $label => $response){
+                     
                         
                         if(isset($groupPercentages[$grupoNombre][$label])) {
                             $groupPercentages[$grupoNombre][$label] += intval($response);
@@ -110,7 +111,9 @@ class RespuestaController extends Controller
                 }
             }, $groupPercentages[$grupoNombre]);
         }
+      
        
+
 
         return view('respuestas.listar_encuestas')
                ->with( ['id' => $experimento_id])

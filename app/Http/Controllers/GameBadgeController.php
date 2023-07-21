@@ -33,9 +33,10 @@ class GameBadgeController extends AppBaseController
      *
      * @return Response
      */
-    public function create()
+    public function create($game_id)
     {
-        return view('game_badges.create');
+
+             return view('game_badges.create', ['game_id' => $game_id]);
     }
 
     /**
@@ -48,9 +49,12 @@ class GameBadgeController extends AppBaseController
     public function store($game_id, CreateGameBadgeRequest $request)
     {
         $input = $request->all();
+        $input['game_id'] = $game_id; // Asignar el valor de $game_id al campo game_id
+      
+        //var_dump($input);
         $gameBadge = GameBadge::create($input);
         Flash::success('La medalla del juego fue guardada exitosamente.');
-        return redirect(route('games.badges.index', $game_id));
+        return redirect(route('game_badges.index', ['game_id' => $game_id]) );
     }
 
     public function badge_image($id)
@@ -94,7 +98,7 @@ class GameBadgeController extends AppBaseController
 
         if (empty($gameBadge)) {
             Flash::error('Game Badge not found');
-            return redirect(route('gameBadges.index'));
+            return redirect(route('game_badges.index', ['game_id' => $game_id]));
         }
 
         $g = $gameBadge->getMedia('badges');
@@ -117,18 +121,20 @@ class GameBadgeController extends AppBaseController
      *
      * @return Response
      */
-    public function edit($id)
+    public function edit($game_id, $badge_id)
     {
         /** @var GameBadge $gameBadge */
-        $gameBadge = GameBadge::find($id);
+        $gameBadge = GameBadge::find($badge_id);
 
         if (empty($gameBadge)) {
             Flash::error('Game Badge not found');
 
-            return redirect(route('gameBadges.index'));
+            return redirect(route('game_badges.index', ['game_id' => $game_id]));
         }
 
-        return view('game_badges.edit')->with('gameBadge', $gameBadge);
+        return view('game_badges.edit')->with('gameBadge', $gameBadge)
+        ->with('game_id'  , $game_id )
+        ->with('badge_id' , $badge_id);
     }
 
     /**
@@ -139,14 +145,15 @@ class GameBadgeController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateGameBadgeRequest $request)
+    public function update($game_id, $bagde_id , UpdateGameBadgeRequest $request)
     {
+
         /** @var GameBadge $gameBadge */
-        $gameBadge = GameBadge::find($id);
+        $gameBadge = GameBadge::find($bagde_id );
 
         if (empty($gameBadge)) {
             Flash::error('Game Badge not found');
-            return redirect(route('gameBadges.index'));
+            return redirect(route('game_badges.index', ['game_id' => $game_id]));
         }
 
         $gameBadge->fill($request->all());
@@ -154,7 +161,7 @@ class GameBadgeController extends AppBaseController
 
         Flash::success('Game Badge updated successfully.');
 
-        return redirect(route('gameBadges.index'));
+        return redirect(route('game_badges.index', ['game_id' => $game_id]));
     }
 
     /**
@@ -166,21 +173,23 @@ class GameBadgeController extends AppBaseController
      *
      * @return Response
      */
-    public function destroy($id)
+    public function destroy($game_id, $badge_id)
     {
+  
         /** @var GameBadge $gameBadge */
-        $gameBadge = GameBadge::find($id);
+        $gameBadge = GameBadge::find($badge_id);
 
         if (empty($gameBadge)) {
             Flash::error('Game Badge not found');
 
-            return redirect(route('gameBadges.index'));
+            return redirect(route('game_badges.index', ['game_id' => $game_id]));
         }
 
         $gameBadge->delete();
 
         Flash::success('Game Badge deleted successfully.');
 
-        return redirect(route('gameBadges.index'));
+        return redirect(route('game_badges.index', ['game_id' => $game_id]));
+        
     }
 }

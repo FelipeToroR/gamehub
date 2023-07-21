@@ -11,7 +11,7 @@
        <div class="box box-primary">
            <div class="box-body">
                <div class="row">
-                   {!! Form::model($gameBadge, ['route' => ['gameBadges.update', $gameBadge->id], 'method' => 'patch']) !!}
+                   {!! Form::model($gameBadge, ['route' => ['games.badges.update', 'game' => $game_id , 'badge' => $gameBadge->id], 'method' => 'patch']) !!}
 
                         @include('game_badges.fields')
 
